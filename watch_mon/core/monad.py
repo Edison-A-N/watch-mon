@@ -7,16 +7,6 @@ from web3 import Web3
 
 from watch_mon.config import config
 
-# Monad testnet RPC URL - replace with your actual RPC URL
-MONAD_TESTNET_RPC = config.MONAD_TESTNET_RPC
-
-# Proxy settings
-HTTP_PROXY = config.HTTP_PROXY
-HTTPS_PROXY = config.HTTPS_PROXY
-
-# Limit concurrent requests
-MAX_CONCURRENT_REQUESTS = config.MAX_CONCURRENT_REQUESTS
-
 # Global session
 session = None
 
