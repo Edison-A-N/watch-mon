@@ -1,6 +1,6 @@
 from mcp.server.fastmcp import FastMCP
 
-from watch_mon.core.monad import connect_to_monad, get_dapp_details
+from watch_mon.core.monad import connect_to_monad, get_dapp_details, get_dapp_transactions
 
 mcp = FastMCP("Monad Chain Protocol")
 
@@ -12,6 +12,17 @@ async def get_contract_details(address: str) -> dict:
         w3 = await connect_to_monad()
         details = await get_dapp_details(w3, address)
         return details
+    except Exception as e:
+        return {"error": str(e)}
+
+
+@mcp.tool()
+async def get_dapp_transactions_count(address: str, days: int = 7) -> dict:
+    """Get transaction count for a dApp in the last N days"""
+    try:
+        w3 = await connect_to_monad()
+        count = await get_dapp_transactions(w3, address, days)
+        return {"address": address, "transaction_count": count, "days": days}
     except Exception as e:
         return {"error": str(e)}
 
