@@ -1,6 +1,6 @@
 from mcp.server.fastmcp import FastMCP
 
-from watch_mon.core.monad import connect_to_monad, get_dapp_details, get_dapp_transactions
+from watch_mon.core.monad import connect_to_monad, get_dapp_details, get_dapp_transactions, get_top_dapps
 
 mcp = FastMCP("Monad Chain Protocol")
 
@@ -38,5 +38,15 @@ async def get_network_info() -> dict:
             "block_number": w3.eth.block_number,
             "gas_price": {"wei": gas_price, "gwei": gas_price / 1e9, "tmon": gas_price / 1e18},
         }
+    except Exception as e:
+        return {"error": str(e)}
+
+
+@mcp.tool()
+async def get_top_contracts(days: int = 7) -> dict:
+    """Get top 10 active contracts on Monad testnet"""
+    try:
+        dapps = await get_top_dapps(days)
+        return {"dapps": dapps, "days": days}
     except Exception as e:
         return {"error": str(e)}

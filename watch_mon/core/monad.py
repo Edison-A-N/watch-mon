@@ -4,6 +4,7 @@ from collections import defaultdict
 
 import aiohttp
 from web3 import Web3
+from tqdm import tqdm
 
 from watch_mon.config import config
 
@@ -112,6 +113,8 @@ async def get_dapp_transactions(w3, dapp_address, days=7):
         tasks.append(get_block_with_concurrency(session, block_number))
 
     responses = await asyncio.gather(*tasks)
+    if config.SHOW_PROGRESS_BAR:
+        responses = tqdm(responses, desc="Processing blocks")
     for response in responses:
         if "result" in response and response["result"]:
             block = response["result"]
@@ -139,22 +142,15 @@ async def discover_dapps(w3, days=7):
     for block_number in range(start_block, start_block + 100):
         tasks.append(get_block_with_concurrency(session, block_number))
 
-    for future in asyncio.as_completed(tasks):
-        try:
-            response = await future
-        except Exception as e:
-            print(f"Error scanning block: {str(e)}")
-            raise e
-        try:
-            if "result" in response and response["result"]:
-                block = response["result"]
-                for tx in block["transactions"]:
-                    if tx["to"]:  # Only count contract interactions
-                        dapp_activity[tx["to"].lower()] += 1
-        except Exception as e:
-            print(f"Error processing block: {str(e)}")
-            print(f"Response: {response}")
-            raise e
+    responses = await asyncio.gather(*tasks)
+    if config.SHOW_PROGRESS_BAR:
+        responses = tqdm(responses, desc="Processing blocks")
+    for response in responses:
+        if "result" in response and response["result"]:
+            block = response["result"]
+            for tx in block["transactions"]:
+                if tx["to"]:  # Only count contract interactions
+                    dapp_activity[tx["to"].lower()] += 1
 
     # Convert to list and sort by transaction count
     dapp_list = [{"address": addr, "transaction_count": count} for addr, count in dapp_activity.items()]
@@ -201,7 +197,10 @@ async def get_dapp_details(w3, dapp_address):
         try:
             # Get the first transaction to this address
             current_block = w3.eth.block_number
-            for block_number in range(max(0, current_block - 1000000), current_block + 1):
+            block_range = range(max(0, current_block - 1000000), current_block + 1)
+            if config.SHOW_PROGRESS_BAR:
+                block_range = tqdm(block_range, desc="Finding creation block")
+            for block_number in block_range:
                 block = w3.eth.get_block(block_number, full_transactions=True)
                 for tx in block.transactions:
                     if tx.to and tx.to.lower() == dapp_address.lower():
@@ -223,7 +222,10 @@ async def get_dapp_details(w3, dapp_address):
         # Get last active block
         try:
             current_block = w3.eth.block_number
-            for block_number in range(current_block, max(0, current_block - 1000), -1):
+            block_range = range(current_block, max(0, current_block - 1000), -1)
+            if config.SHOW_PROGRESS_BAR:
+                block_range = tqdm(block_range, desc="Finding last active block")
+            for block_number in block_range:
                 block = w3.eth.get_block(block_number, full_transactions=True)
                 for tx in block.transactions:
                     if tx.to and tx.to.lower() == dapp_address.lower():
@@ -250,7 +252,10 @@ async def get_dapp_details(w3, dapp_address):
                 # Create contract instance for interface detection
                 contract = w3.eth.contract(address=dapp_address, abi=[])
 
-                for interface_name, interface_id in interfaces.items():
+                interface_items = interfaces.items()
+                if config.SHOW_PROGRESS_BAR:
+                    interface_items = tqdm(interface_items, desc="Detecting interfaces")
+                for interface_name, interface_id in interface_items:
                     try:
                         # Try to call supportsInterface
                         result = contract.functions.supportsInterface(interface_id).call()

@@ -1,4 +1,5 @@
 from typing import Optional
+from dotenv import find_dotenv
 
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings
@@ -18,6 +19,9 @@ class Config(BaseSettings):
     # Logging settings
     LOG_LEVEL: str = Field(default="INFO")
 
+    # UI settings
+    SHOW_PROGRESS_BAR: bool = Field(default=False)
+
     @field_validator("MONAD_TESTNET_RPC")
     @classmethod
     def validate_monad_rpc(cls, v: str) -> str:
@@ -26,7 +30,7 @@ class Config(BaseSettings):
         return v
 
     class Config:
-        env_file = ".env"
+        env_file = find_dotenv()
         case_sensitive = True
 
 
