@@ -1,7 +1,7 @@
 from typing import Optional
 from dotenv import find_dotenv
 
-from pydantic import Field, field_validator
+from pydantic import Field, field_validator, ConfigDict
 from pydantic_settings import BaseSettings
 
 
@@ -29,9 +29,7 @@ class Config(BaseSettings):
             raise ValueError("MONAD_TESTNET_RPC is not set")
         return v
 
-    class Config:
-        env_file = find_dotenv()
-        case_sensitive = True
+    model_config = ConfigDict(env_file=find_dotenv(), case_sensitive=True)
 
 
 # Global config instance
