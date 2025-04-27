@@ -161,10 +161,10 @@ async def discover_dapps(w3, days=7):
     return sorted(dapp_list, key=lambda x: x["transaction_count"], reverse=True)
 
 
-async def get_top_dapps():
+async def get_top_dapps(days=7):
     """Get top 10 active dApps on Monad testnet"""
     w3 = await connect_to_monad()
-    dapp_activity = await discover_dapps(w3)
+    dapp_activity = await discover_dapps(w3, days)
     return dapp_activity[:10]
 
 

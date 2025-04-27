@@ -21,7 +21,7 @@ async def test_connect_to_monad():
 @pytest.mark.asyncio
 async def test_get_top_dapps():
     """Test getting top dApps"""
-    dapps = await get_top_dapps()
+    dapps = await get_top_dapps(days=1)
     assert isinstance(dapps, list)
     if dapps:  # If any dApps are found
         assert "address" in dapps[0]
