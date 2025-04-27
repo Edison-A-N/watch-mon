@@ -1,0 +1,28 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+# Watch-Mon Project Guide
+
+## Project Structure
+The main entry point is [cli.py](mdc:watch_mon/cli.py), which provides the CLI interface for the MCP server.
+
+### Core Components
+- [monad.py](mdc:watch_mon/core/monad.py): Core functionality for interacting with Monad testnet
+- [config.py](mdc:watch_mon/config.py): Configuration management using pydantic
+- [mcp_server.py](mdc:watch_mon/api/mcp_server.py): MCP server implementation
+
+### Key Features
+1. Monad Chain Protocol monitoring
+   - Contract details lookup
+   - Network information
+   - Transaction tracking
+
+2. Configuration
+   - Environment variables in `.env` file
+   - MCP server config in JSON format
+
+### Development
+- Tests are in [test_monad.py](mdc:tests/test_monad.py)
+- Dependencies managed in [pyproject.toml](mdc:pyproject.toml)
