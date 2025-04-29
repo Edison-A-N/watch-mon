@@ -23,13 +23,15 @@ class Config(BaseSettings):
     SHOW_PROGRESS_BAR: bool = Field(default=False)
 
     @field_validator("MONAD_TESTNET_RPC")
-    @classmethod
     def validate_monad_rpc(cls, v: str) -> str:
         if not v:
             raise ValueError("MONAD_TESTNET_RPC is not set")
         return v
 
-    model_config = ConfigDict(env_file=find_dotenv(), case_sensitive=True)
+    model_config = ConfigDict(
+        env_file=find_dotenv(),
+        case_sensitive=True,
+    )
 
 
 # Global config instance
